@@ -1,0 +1,23 @@
+<ul class="task-list" id="daily-task-list">
+{% for task in daily_tasks %}
+    <li class="task-item">
+        <div class="task-title">{{ task.Title }}</div>
+        <div class="task-info">{{ task.Info }}</div>
+        <div class="task-actions">
+            <a href="#" class="action-btn"
+               data-url="/api/finish_DailyTask/{{ task.TaskID }}">✅ 完成</a>
+            <a href="#" class="action-btn"
+               data-url="/api/delete_DailyTask/{{ task.TaskID }}">🗑️ 删除</a>
+            <a href="/edit_DailyTask/{{ task.TaskID }}">✏️ 修改</a>
+            {% if not loop.first %}
+            <a href="#" class="move-btn"
+               data-url="/api/move_up_DailyTask/{{ task.TaskID }}">⬆️</a>
+            {% endif %}
+            {% if not loop.last %}
+            <a href="#" class="move-btn"
+               data-url="/api/move_down_DailyTask/{{ task.TaskID }}">⬇️</a>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
+</ul>

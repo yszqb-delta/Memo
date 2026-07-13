@@ -1,0 +1,10 @@
+{
+    "DailyID": 1,
+    "LongTermID": 1,
+    "DiaryID": 1,
+    "TimerID": 1,
+    "DailyTask": [],
+    "LongTermTask": [],
+    "Diary": [],
+    "TimerTask": []
+}

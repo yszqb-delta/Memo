@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>备忘录📝</title>
+    <style>
+        * { margin:0; padding:0; box-sizing: border-box; }
+
+        body{
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad961);
+        }
+
+        /* ==================== 导航栏 ==================== */
+        .navbar {
+            width: fit-content;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+
+            background: transparent;
+            border-radius: 0;
+            border: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            position: relative;
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            opacity: 0.9;
+            padding: 8px 16px;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            z-index: 1;
+        }
+
+        .nav-links a:hover { opacity: 1; }
+
+        .nav-links a.active {
+            opacity: 1;
+            color: #ffeaa7;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+            transform: scale(1.06);
+            z-index: 10;
+        }
+
+        .navbar-wrapper {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            width: fit-content;
+            max-width: calc(100% - 40px);
+            margin: 0 auto;
+            padding: 0;
+            background: rgba(142, 32, 148, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+
+            transition: top 0.3s ease,
+                        border-radius 0.3s ease,
+                        padding 0.3s ease;
+        }
+
+        .navbar-wrapper.scrolled {
+            top: 0;
+            border-radius: 0 0 14px 14px;
+            padding: 15px 15px;
+        }
+
+        .navbar-wrapper.scrolled .navbar {
+            padding: 0;
+        }
+
+        /* ==================== 导航栏日期 ==================== */
+        .nav-date {
+            margin-left: 24px;
+            font-size: 14px;
+            opacity: 0.85;
+            white-space: nowrap;
+        }
+
+        /* ==================== 主内容区 ==================== */
+        .content {
+            padding-top: 100px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            width: 600px;
+            padding: 24px;
+            background: rgba(142, 32, 148, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        /* ==================== 任务卡片 ==================== */
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 12px;
+        }
+
+        .task-item {
+            background: rgba(142, 32, 148, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .task-title {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .task-info {
+            opacity: 0.85;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .task-time {
+            font-size: 12px;
+            opacity: 0.75;
+            margin-top: 6px;
+        }
+
+        .task-tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 6px;
+        }
+
+        .task-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .task-actions a {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            transition: opacity 0.2s;
+        }
+
+        .task-actions a:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .section-title {
+            margin-top: 24px;
+        }
+
+        .empty-tip {
+            opacity: 0.7;
+        }
+
+        .btn-entry {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 12px;
+            text-align: center;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .btn-entry:hover { opacity: 1; }
+
+        /* ==================== 自定义确认框 ==================== */
+        .confirm-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirm-modal.hidden {
+            display: none;
+        }
+
+        .confirm-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .confirm-card {
+            position: relative;
+            width: 340px;
+            padding: 24px;
+            border-radius: 16px;
+            background: rgba(142, 32, 148, 0.18);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            z-index: 1;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .confirm-card h3 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .confirm-card p {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            cursor: pointer;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.2s;
+        }
+
+        .confirm-actions .btn-confirm {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .confirm-actions button:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar-wrapper">
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li><a href="/?page=today" class="{% if page == 'today' %}active{% endif %}">今日任务</a></li>
+                <li><a href="/?page=diary" class="{% if page == 'diary' %}active{% endif %}">日记</a></li>
+            </ul>
+            <div class="nav-date">📅 {{ today }}</div>
+        </nav>
+    </header>
+
+    <main class="content">
+        {% if page == "today" %}
+            <section class="card">
+                <h2>📅 每日任务</h2>
+
+                {% if daily_tasks %}
+                    {% include "_daily_tasks.html" %}
+                {% elif all_done %}
+                    <div class="empty-tip" style="padding: 32px; text-align: center;">
+                        🎉 今日任务已全部完成
+                    </div>
+                {% else %}
+                    <div class="empty-tip" style="padding: 32px; text-align: center;">
+                        暂无每日任务
+                    </div>
+                {% endif %}
+
+                <a href="/add_DailyTask" class="btn-entry">＋ 加入新任务</a>
+
+                <h2 class="section-title">🎯 长期任务</h2>
+
+                {% if longterm_tasks %}
+                {% include "_longterm_tasks.html" %}
+                {% else %}
+                    <p class="empty-tip">暂无长期任务</p>
+                {% endif %}
+
+                <a href="/add_LongTerm" class="btn-entry">＋ 新增长期任务</a>
+
+                <h2 class="section-title">⏰ 定时任务</h2>
+
+                {% if timer_tasks %}
+                    <ul class="task-list">
+                    {% for task in timer_tasks %}
+                        <li class="task-item">
+                            <span class="task-tag">
+                                {% if task.Repeat == 'none' %}一次性
+                                {% elif task.Repeat == 'daily' %}每天
+                                {% elif task.Repeat == 'weekly' %}每周
+                                {% elif task.Repeat == 'monthly' %}每月
+                                {% elif task.Repeat == 'yearly' %}每年
+                                {% endif %}
+                            </span>
+                            <div class="task-title">{{ task.Title }}</div>
+                            <div class="task-info">{{ task.Info }}</div>
+                            <div class="task-time">⏰ 触发日期：{{ task.TriggerDate }}</div>
+
+                            <div class="task-actions">
+                                <a href="/edit_Timer/{{ task.TaskID }}">✏️ 修改</a>
+                                <a href="/delete_Timer/{{ task.TaskID }}">🗑️ 取消</a>
+                            </div>
+                            <div class="task-time">
+                                ⏰ 触发方式：
+                                {% if task.Repeat == "none" %}
+                                    仅一次 · {{ task.TriggerDate }}
+                                {% elif task.Repeat == "daily" %}
+                                    每天
+                                {% elif task.Repeat == "weekly" %}
+                                    每周{{ task.WeekDayText }}
+                                {% elif task.Repeat == "monthly" %}
+                                    每月 {{ task.TriggerDate[-2:] }} 日
+                                {% elif task.Repeat == "yearly" %}
+                                    每年 {{ task.TriggerDate[5:] }}
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-tip">暂无定时任务</p>
+                {% endif %}
+
+                <a href="/add_Timer" class="btn-entry">＋ 新增定时任务</a>
+            </section>
+        {% endif %}
+
+        {% if page == "diary" %}
+            <section class="card">
+                <h2>📝 日记</h2>
+
+                {% if diary_list %}
+                    <ul class="task-list">
+                    {% for diary in diary_list %}
+                        <li class="task-item">
+                            <div class="task-title">📅 {{ diary.Date }}</div>
+                            <div class="task-info" style="margin-top:8px; white-space: pre-line;">
+                                {{ diary.Content }}
+                            </div>
+
+                            <div class="task-actions">
+                                <a href="/edit_Diary/{{ diary.DiaryID }}">✏️ 修改</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty-tip">暂无日记</p>
+                {% endif %}
+
+                <a href="/add_Diary" class="btn-entry">＋ 写新日记</a>
+            </section>
+        {% endif %}
+    </main>
+
+<!-- 自定义确认框 -->
+<div id="confirm-modal" class="confirm-modal hidden">
+    <div class="confirm-backdrop"></div>
+    <div class="confirm-card">
+        <h3 id="confirm-title">确认操作</h3>
+        <p id="confirm-message">确定要执行此操作吗？</p>
+        <div class="confirm-actions">
+            <button class="btn-cancel">取消</button>
+            <button class="btn-confirm">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let confirmCallback = null;
+
+function showConfirm(title, message, callback) {
+    document.getElementById('confirm-title').innerText = title;
+    document.getElementById('confirm-message').innerText = message;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+    confirmCallback = callback;
+}
+
+function hideConfirm() {
+    document.getElementById('confirm-modal').classList.add('hidden');
+    confirmCallback = null;
+}
+
+function bindTaskButtons() {
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            let title = "确认操作";
+            let message = "确定要执行此操作吗？";
+
+            if (btn.dataset.url.includes('delete')) {
+                title = "删除任务";
+                message = "确定要删除这条任务吗？删除后不可恢复。";
+            }
+
+            if (btn.dataset.url.includes('finish')) {
+                title = "完成任务";
+                message = "确定标记为完成吗？完成后将从列表中移除。";
+            }
+
+            showConfirm(title, message, async () => {
+                const res = await fetch(btn.dataset.url);
+                const html = await res.text();
+
+                if (btn.dataset.url.includes('DailyTask')) {
+                    document.getElementById('daily-task-list').outerHTML = html;
+                }
+                if (btn.dataset.url.includes('LongTerm')) {
+                    document.getElementById('longterm-task-list').outerHTML = html;
+                }
+
+                bindTaskButtons();
+            });
+        });
+    });
+
+    document.querySelectorAll('.move-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const res = await fetch(btn.dataset.url);
+            const html = await res.text();
+
+            if (btn.dataset.url.includes('DailyTask')) {
+                document.getElementById('daily-task-list').outerHTML = html;
+            }
+            if (btn.dataset.url.includes('LongTerm')) {
+                document.getElementById('longterm-task-list').outerHTML = html;
+            }
+
+            bindTaskButtons();
+        });
+    });
+}
+
+// 确认框按钮事件
+document.querySelector('.btn-confirm').addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    hideConfirm();
+});
+
+document.querySelector('.btn-cancel').addEventListener('click', hideConfirm);
+document.querySelector('.confirm-backdrop').addEventListener('click', hideConfirm);
+
+bindTaskButtons();
+
+window.addEventListener('scroll', () => {
+    document.querySelector('.navbar-wrapper')
+        .classList.toggle('scrolled', window.scrollY > 40);
+});
+
+</script>
+
+</body>
+</html>

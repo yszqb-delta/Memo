@@ -1,0 +1,25 @@
+<ul class="task-list" id="longterm-task-list">
+{% for task in longterm_tasks %}
+    <li class="task-item">
+        <span class="task-tag">长期</span>
+        <div class="task-title">{{ task.Title }}</div>
+        <div class="task-info">{{ task.Info }}</div>
+        <div class="task-time">🕗 开始：{{ task.StartDate }}</div>
+        <div class="task-time">⏰ 最迟：{{ task.Deadline }}</div>
+        <div class="task-actions">
+            <a href="#" class="action-btn"
+               data-url="/api/finish_LongTerm/{{ task.TaskID }}">✅ 完成</a>
+            <a href="/edit_LongTerm/{{ task.TaskID }}">✏️ 修改</a>
+            {% if not loop.first %}
+            <a href="#" class="move-btn"
+               data-url="/api/move_up_LongTerm/{{ task.TaskID }}">⬆️</a>
+            {% endif %}
+
+            {% if not loop.last %}
+            <a href="#" class="move-btn"
+               data-url="/api/move_down_LongTerm/{{ task.TaskID }}">⬇️</a>
+            {% endif %}
+        </div>
+    </li>
+{% endfor %}
+</ul>
